@@ -1,11 +1,10 @@
-import { siteConfig } from '../config';
-import { BaseballMark, GithubIcon } from './icons';
+import { BaseballMark } from './icons';
 
 export function SiteHeader() {
   return (
     <header className="header">
       <div className="shell header__inner">
-        <a className="brand" href="#top" aria-label={`${siteConfig.name} home`}>
+        <a className="brand" href="#top" aria-label="Sabermetrics AI home">
           <BaseballMark className="brand__mark" />
           <span>
             Sabermetrics <span className="brand__ai">AI</span>
@@ -13,28 +12,14 @@ export function SiteHeader() {
         </a>
 
         <nav className="nav" aria-label="Primary">
-          <a className="nav__link" href="#capabilities">
+          <a className="nav__link" href="#about">
             About
           </a>
           <a className="nav__link" href="#how-it-works">
-            How it works
+            How It Works
           </a>
-          <a
-            className="nav__link nav__link--hide-sm"
-            href={siteConfig.docsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Docs
-          </a>
-          <a
-            className="nav__link nav__link--external"
-            href={siteConfig.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GithubIcon />
-            <span className="nav__link--hide-sm">GitHub</span>
+          <a className="nav__link" href="#data">
+            Data
           </a>
         </nav>
       </div>

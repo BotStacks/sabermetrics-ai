@@ -51,6 +51,9 @@ html {
 body {
   min-height: 100vh;
   min-height: 100svh;
+  /* `clip` rather than `hidden`: it guards against a stray sideways scrollbar
+     without creating a scroll container that would break the sticky header. */
+  overflow-x: clip;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);

@@ -1,71 +1,43 @@
-export interface ExamplePrompt {
-  /** Short label for the chip. */
-  label: string;
-  /** The full question actually sent to the assistant. */
-  question: string;
-}
-
-export const EXAMPLE_PROMPTS: ExamplePrompt[] = [
-  { label: 'What is WAR?', question: 'What is WAR?' },
-  {
-    label: 'Explain wRC+ simply',
-    question: "Explain wRC+ like I'm new to baseball.",
-  },
-  {
-    label: 'OPS vs wOBA',
-    question: 'What is the difference between OPS and wOBA?',
-  },
-  { label: 'Why BABIP matters', question: 'Why does BABIP matter?' },
-  { label: 'Read a 125 wRC+', question: 'What does a wRC+ of 125 mean?' },
-  {
-    label: 'Compare two players',
-    question: 'Compare two players using the available data.',
-  },
+/** Static examples of the kind of question the assistant is built for. */
+export const EXAMPLE_PROMPTS: string[] = [
+  'What is WAR?',
+  'Explain wRC+ simply',
+  'OPS vs wOBA',
+  'Compare two players',
 ];
 
 export interface Capability {
   title: string;
   description: string;
-  examples: string[];
 }
 
 export const CAPABILITIES: Capability[] = [
   {
-    title: 'Plain-English definitions',
+    title: 'Learn advanced baseball metrics',
     description:
-      'Every stat explained twice — once for someone new to the sport, once with the formula and the assumptions behind it.',
-    examples: ['What is WAR?', 'Explain wRC+ simply', 'What counts as a quality start?'],
+      'WAR, wRC+, wOBA, FIP, BABIP — explained in plain English first, with the formula and its assumptions underneath.',
   },
   {
-    title: 'Metric comparisons',
+    title: 'Ask across websites, documents and structured data',
     description:
-      'Where two stats overlap, where they disagree, and which one answers the question you are actually asking.',
-    examples: ['OPS vs wOBA', 'FIP vs ERA', 'xwOBA vs wOBA'],
+      'One question reaches every source in the knowledge base, whether it is a crawled page, an uploaded document or a table of season stats.',
   },
   {
-    title: 'Reading a number',
+    title: 'Get answers grounded in your knowledge base',
     description:
-      'League baselines and context, so a raw figure turns into a judgement you can defend.',
-    examples: ['What does a 125 wRC+ mean?', 'Is a .310 BABIP high?', 'How good is 4.0 WAR?'],
-  },
-  {
-    title: 'Player and leaderboard questions',
-    description:
-      'Side-by-side comparisons and category leaders, answered from the dataset the assistant has been given.',
-    examples: ['Compare two players', 'Who leads in wRC+?', 'Best strikeout rate available?'],
+      'Responses come from the material you connected, with the sources behind them — not from a model guessing at a box score.',
   },
 ];
 
-export interface DataType {
-  label: string;
-  detail: string;
-}
+export const DATA_FAMILIES: string[] = [
+  'Batting — AVG, OBP, SLG, OPS, wOBA, wRC+, ISO, BABIP',
+  'Pitching — ERA, FIP, xFIP, SIERA, K%, BB%, WHIP',
+  'Value and fielding — WAR, WPA, DRS, OAA',
+  'Batted ball — exit velocity, launch angle, barrel rate',
+];
 
-export const DATA_TYPES: DataType[] = [
-  { label: 'Batting', detail: 'AVG, OBP, SLG, OPS, wOBA, wRC+, ISO, BABIP' },
-  { label: 'Pitching', detail: 'ERA, FIP, xFIP, SIERA, K%, BB%, WHIP' },
-  { label: 'Value', detail: 'WAR, WPA, Win Shares, run expectancy' },
-  { label: 'Batted ball', detail: 'Exit velocity, launch angle, hard-hit rate, barrels' },
-  { label: 'Fielding', detail: 'DRS, UZR, OAA, framing runs' },
-  { label: 'Concepts', detail: 'Regression, sample size, park and league adjustments' },
+export const HOW_IT_WORKS: string[] = [
+  'Connect baseball sources to a BotStacks assistant.',
+  'BotStacks indexes them into a searchable knowledge base.',
+  'Ask in plain English and get a grounded, cited answer.',
 ];
