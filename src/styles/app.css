@@ -1,0 +1,368 @@
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--line);
+  background: rgba(8, 9, 12, 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  height: 100%;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: -0.015em;
+}
+
+.brand__mark {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.brand__ai {
+  color: var(--accent-bright);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.nav__link {
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.nav__link:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   Stage: short intro + the widget mount, sharing one viewport-height band
+   ========================================================================== */
+
+.stage-section {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  /* minmax-free sizing chain: the band fills the fold but may grow past it. */
+  min-height: calc(100svh - var(--header-h));
+  padding-block: 32px 36px;
+}
+
+/* ---- Intro ---- */
+
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 48px;
+  min-width: 0;
+}
+
+.intro__copy {
+  min-width: 0;
+  max-width: 62ch;
+}
+
+.intro__title {
+  font-size: clamp(1.9rem, 1.4vw + 1.4rem, 2.6rem);
+  letter-spacing: -0.032em;
+}
+
+.intro__title em {
+  font-style: normal;
+  color: var(--accent-bright);
+}
+
+.intro__lede {
+  margin-top: 10px;
+  max-width: 58ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+/* Static examples. Not controls — no hover, no cursor, no handlers. */
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.examples__item {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.examples__item::before {
+  content: '“';
+}
+
+.examples__item::after {
+  content: '”';
+}
+
+/* ==========================================================================
+   BotStacks widget mount — the centerpiece
+   ========================================================================== */
+
+.widget-mount {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Generous by design: the real widget should feel like the whole product. */
+  min-height: min(68svh, 760px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(24, 27, 36, 0.88) 0%, rgba(11, 13, 18, 0.97) 52%), var(--surface);
+  box-shadow:
+    0 40px 90px -52px rgba(0, 0, 0, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  overflow: hidden;
+}
+
+/* Hairline of accent along the top edge, like product chrome. */
+.widget-mount::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(91, 140, 255, 0.5) 24%,
+    rgba(217, 84, 59, 0.32) 64%,
+    transparent
+  );
+}
+
+/* The mounting point. Anything rendered here fills the stage. */
+.widget-mount__root {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Development marker. Remove this element when the widget is wired up. */
+.widget-mount__placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-content: center;
+  padding: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-align: center;
+  color: var(--text-faint);
+}
+
+/* ==========================================================================
+   Supporting sections
+   ========================================================================== */
+
+.section {
+  padding-block: 56px;
+  border-top: 1px solid var(--line);
+}
+
+.section__title {
+  margin-bottom: 24px;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.capabilities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 36px;
+}
+
+.capability {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 18px;
+  border-top: 2px solid rgba(91, 140, 255, 0.4);
+}
+
+.capability__title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.capability__desc {
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--text-dim);
+}
+
+.section--details {
+  padding-block: 48px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 36px 56px;
+}
+
+.details__list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.details__list--steps {
+  counter-reset: step;
+}
+
+.details__list--steps li {
+  counter-increment: step;
+}
+
+.details__list--steps li::before {
+  content: counter(step) '. ';
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.footer {
+  margin-top: auto;
+  padding-block: 24px 32px;
+  border-top: 1px solid var(--line);
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.footer__inner a:hover {
+  color: var(--text);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 860px) {
+  .intro {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .stage-section {
+    gap: 20px;
+    padding-block: 26px 30px;
+  }
+
+  /* One swipeable row so the examples never push the mount down the page. */
+  .examples {
+    flex-wrap: nowrap;
+    width: calc(100% + var(--page-pad) * 2);
+    margin-inline: calc(var(--page-pad) * -1);
+    padding-inline: var(--page-pad);
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .examples::-webkit-scrollbar {
+    display: none;
+  }
+
+  .examples__item {
+    flex: none;
+    scroll-snap-align: start;
+  }
+
+  .widget-mount {
+    min-height: min(62svh, 620px);
+  }
+}
+
+@media (max-width: 640px) {
+  .stage-section {
+    gap: 16px;
+    padding-block: 20px 24px;
+  }
+
+  .intro__lede {
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .widget-mount {
+    min-height: min(60svh, 540px);
+    border-radius: var(--radius-md);
+  }
+
+  .section {
+    padding-block: 40px;
+  }
+
+  .capabilities {
+    gap: 26px;
+  }
+}
