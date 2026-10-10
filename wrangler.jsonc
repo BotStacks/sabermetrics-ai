@@ -1,7 +1,22 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // Standalone Worker for this site only. Never rename this to an existing
+  // BotStacks Worker — `wrangler deploy` updates a Worker in place when the
+  // name matches.
   "name": "sabermetrics-ai",
   "compatibility_date": "2026-10-10",
+
+  // Deploy to the generated <name>.<subdomain>.workers.dev URL only.
+  //
+  // SAFETY: there is intentionally no `routes`, `route` or custom domain here.
+  // Adding one would attach this Worker to a hostname on an existing zone. Do
+  // not point it at botstacks.ai or any of its subdomains (www, app, api,
+  // core, sandbox, sandbox-api, sandbox-core) — those serve BotStacks
+  // production. The only hostname this project should ever claim is
+  // sabermetrics.ai, and that is not configured yet.
+  "workers_dev": true,
+
   // Static-assets only: no `main`, so no Worker script is deployed. Every
   // request is served straight from the asset store.
   "assets": {
@@ -9,6 +24,7 @@
     // rather than a 404.
     "not_found_handling": "single-page-application"
   },
+
   "observability": {
     "enabled": true
   }
