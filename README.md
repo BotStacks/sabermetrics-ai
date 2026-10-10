@@ -18,12 +18,13 @@ npm run dev
 npm run build
 ```
 
-| Script              | What it does                                |
-| ------------------- | ------------------------------------------- |
-| `npm run dev`       | Vite dev server                             |
-| `npm run build`     | Type-check (`tsc -b`) then production build |
-| `npm run preview`   | Serve the production build locally          |
-| `npm run typecheck` | Types only                                  |
+| Script              | What it does                                              |
+| ------------------- | --------------------------------------------------------- |
+| `npm run dev`       | Vite dev server                                           |
+| `npm run build`     | Type-check (`tsc -b`) then production build               |
+| `npm run preview`   | Build, then serve it locally in the Workers runtime       |
+| `npm run deploy`    | Build, then deploy to Cloudflare Workers                  |
+| `npm run typecheck` | Types only                                                |
 
 ---
 
@@ -80,4 +81,28 @@ src/
 
 ## Deployment
 
-`dist/` is plain static output, suitable for any static host. Hosting is not configured yet.
+Hosted on **Cloudflare Workers with static assets**, via the
+[Cloudflare Vite plugin](https://developers.cloudflare.com/workers/vite-plugin/).
+
+```bash
+npx wrangler login     # once per machine
+npm run deploy
+```
+
+`wrangler.jsonc` is the input config: Worker name `sabermetrics-ai`, compatibility date
+`2026-10-10`, and `not_found_handling: "single-page-application"` so client-side routes resolve to
+`index.html` instead of a 404. There is deliberately no `main` field — this is an assets-only
+deployment with no Worker script and no API routes, so every request is served from the asset
+store.
+
+`vite build` writes a separate output config to `dist/wrangler.json`, a snapshot pointing at the
+build artifacts. `wrangler deploy` picks that up automatically; you do not deploy `wrangler.jsonc`
+directly.
+
+Validate packaging without deploying:
+
+```bash
+npm run build && npx wrangler deploy --dry-run
+```
+
+No custom domain is attached — deployments land on the generated `workers.dev` URL.

@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "sabermetrics-ai",
+  "compatibility_date": "2026-10-10",
+  // Static-assets only: no `main`, so no Worker script is deployed. Every
+  // request is served straight from the asset store.
+  "assets": {
+    // The site is a client-rendered SPA, so unmatched paths return index.html
+    // rather than a 404.
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
