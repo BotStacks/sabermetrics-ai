@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "sabermetrics-api-edge-staging",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-10",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "vars": {
+    "ORIGIN": "https://sandbox-api.botstacks.ai",
+    "ALLOWED_ORIGINS": "https://sabermetrics-staging.webflow.io,http://localhost:5173,http://127.0.0.1:5173"
+  }
+}
