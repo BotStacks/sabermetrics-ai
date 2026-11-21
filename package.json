@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy",
+    "deploy:api-edge": "wrangler deploy -c workers/api-edge/wrangler.jsonc",
+    "test:api-edge": "node --experimental-strip-types --test workers/api-edge/src/index.test.ts",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
