@@ -5,13 +5,11 @@
   "compatibility_date": "2026-10-10",
   "workers_dev": true,
   "observability": { "enabled": true },
-  // Keep shared origin as the wrangler default until dedicated DNS + LE TLS
-  // are Ready. Dashboard may override ORIGIN; do not point ORIGIN at the
-  // dedicated host until sabermetrics-sandbox-api.botstacks.ai resolves and
-  // serves a trusted cert. Never attach this Worker as a route on the
-  // dedicated origin hostname (orange-to-orange loop).
+  // Dedicated Sabermetrics origin (DNS verified 2026-11-23). Never attach this
+  // Worker as a route on sabermetrics-sandbox-api.botstacks.ai (orange-to-orange
+  // loop). Keep GATE_MODE=off until origin LE cert is Ready (not Fake Certificate).
   "vars": {
-    "ORIGIN": "https://sandbox-api.botstacks.ai",
+    "ORIGIN": "https://sabermetrics-sandbox-api.botstacks.ai",
     "ALLOWED_ORIGINS": "https://sabermetrics-staging.webflow.io,http://localhost:5173,http://127.0.0.1:5173"
   },
   // Staging abuse control only — authoritative quotas remain in the API ledger.

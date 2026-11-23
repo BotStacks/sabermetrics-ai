@@ -28,18 +28,20 @@ API middleware trusts connection `Host` only (not `Origin` / `X-Forwarded-Host`)
 
 ### Safe ORIGIN flip (no routing loop)
 
-1. DNS `A sabermetrics-sandbox-api → 143.244.212.56` (proxied) must exist and resolve.
-2. Wait until origin presents a Let's Encrypt cert for that hostname (not the
-   Kubernetes Fake Certificate). Zone SSL `full` tolerates the fake cert for
-   smoke, but LE Ready is required before `enforce_hosts`.
-3. Set Worker `ORIGIN=https://sabermetrics-sandbox-api.botstacks.ai`.
+1. DNS `A sabermetrics-sandbox-api → 143.244.212.56` (proxied) must exist and resolve
+   (**verified** America/New_York 2026-11-23: record saved, Worker 530 cleared).
+2. Client→Cloudflare TLS uses Universal SSL `*.botstacks.ai`. Origin→ingress may
+   still show Kubernetes Fake Certificate until cert-manager LE Ready — zone SSL
+   `full` allows Worker subrequests meanwhile. **Do not** flip API
+   `GATE_MODE=enforce_hosts` until LE issues `sabermetrics-sandbox-api-tls`.
+3. Worker `ORIGIN` is `https://sabermetrics-sandbox-api.botstacks.ai`.
 4. **Do not** add a Worker route on `sabermetrics-sandbox-api.botstacks.ai` —
    that hostname is the API origin. Keep this Worker on `workers.dev` (or a
    separate edge hostname). Routing the Worker onto its own ORIGIN causes an
    orange-to-orange loop.
-5. If ORIGIN was flipped before DNS existed, Worker returns Cloudflare **530
-   Origin DNS error** — temporarily set ORIGIN back to
-   `https://sandbox-api.botstacks.ai` until steps 1–2 pass.
+5. If DNS is deleted or ORIGIN points at a missing host, Worker returns Cloudflare
+   **530 Origin DNS error** — temporarily set ORIGIN back to
+   `https://sandbox-api.botstacks.ai` until DNS resolves again.
 
 ## Tests
 
