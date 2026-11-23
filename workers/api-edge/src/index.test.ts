@@ -36,13 +36,16 @@ describe("corsHeaders", () => {
 });
 
 describe("isNoCachePath", () => {
-  it("covers auth, chat, SSE-related, billing and Stripe paths", () => {
+  it("covers auth, GraphQL, chat, SSE-related, billing and Stripe paths", () => {
     assert.equal(isNoCachePath("/auth/login"), true);
+    assert.equal(isNoCachePath("/graphql"), true);
+    assert.equal(isNoCachePath("/graphql/"), true);
     assert.equal(isNoCachePath("/widget/chat"), true);
     assert.equal(isNoCachePath("/webhooks/stripe/sabermetrics"), true);
     assert.equal(isNoCachePath("/v1/chat/completions"), true);
     assert.equal(isNoCachePath("/billing/portal"), true);
     assert.equal(isNoCachePath("/stripe/checkout"), true);
+    assert.equal(isNoCachePath("/account/me"), true);
     assert.equal(isNoCachePath("/healthz"), false);
   });
 });

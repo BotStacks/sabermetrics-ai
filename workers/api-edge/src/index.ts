@@ -20,6 +20,7 @@ export interface Env {
 export const NO_CACHE_PREFIXES = [
   "/webhooks/",
   "/auth/",
+  "/graphql",
   "/widget/session",
   "/widget/chat",
   "/widget/handoff",
@@ -27,6 +28,7 @@ export const NO_CACHE_PREFIXES = [
   "/v1/",
   "/billing/",
   "/stripe/",
+  "/account/",
 ] as const;
 
 const SECURITY_HEADERS: Record<string, string> = {
