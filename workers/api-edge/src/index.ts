@@ -20,6 +20,7 @@ export interface Env {
 export const NO_CACHE_PREFIXES = [
   "/webhooks/",
   "/auth/",
+  "/graphql",
   "/widget/session",
   "/widget/chat",
   "/widget/handoff",
@@ -27,6 +28,7 @@ export const NO_CACHE_PREFIXES = [
   "/v1/",
   "/billing/",
   "/stripe/",
+  "/account/",
 ] as const;
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -79,6 +81,22 @@ export function needsTurnstile(pathname: string, method: string): boolean {
 
 function requestId(req: Request): string {
   return req.headers.get("x-request-id") || crypto.randomUUID();
+}
+
+/** Attach request-id, forwarded host, and optional origin-gate secret. */
+export function applyUpstreamEdgeHeaders(
+  headers: Headers,
+  rid: string,
+  forwardedHost: string,
+  edgeSharedSecret: string | undefined,
+): Headers {
+  headers.set("x-request-id", rid);
+  headers.set("x-forwarded-host", forwardedHost);
+  if (edgeSharedSecret) {
+    headers.set("x-sabermetrics-edge", edgeSharedSecret);
+  }
+  headers.delete("host");
+  return headers;
 }
 
 async function verifyTurnstile(
@@ -170,13 +188,12 @@ export default {
     }
 
     const upstream = new URL(url.pathname + url.search, env.ORIGIN);
-    const headers = new Headers(request.headers);
-    headers.set("x-request-id", rid);
-    headers.set("x-forwarded-host", url.host);
-    if (env.EDGE_SHARED_SECRET) {
-      headers.set("x-sabermetrics-edge", env.EDGE_SHARED_SECRET);
-    }
-    headers.delete("host");
+    const headers = applyUpstreamEdgeHeaders(
+      new Headers(request.headers),
+      rid,
+      url.host,
+      env.EDGE_SHARED_SECRET,
+    );
 
     const timeoutMs = Number(env.UPSTREAM_TIMEOUT_MS || "55000");
     const timeoutSignal =
