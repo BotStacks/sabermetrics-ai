@@ -5,8 +5,23 @@
   "compatibility_date": "2026-10-10",
   "workers_dev": true,
   "observability": { "enabled": true },
+  // Dedicated Sabermetrics origin (DNS verified 2026-11-23). Never attach this
+  // Worker as a route on sabermetrics-sandbox-api.botstacks.ai (orange-to-orange
+  // loop). Keep GATE_MODE=off until origin LE cert is Ready (not Fake Certificate).
   "vars": {
-    "ORIGIN": "https://sandbox-api.botstacks.ai",
+    "ORIGIN": "https://sabermetrics-sandbox-api.botstacks.ai",
     "ALLOWED_ORIGINS": "https://sabermetrics-staging.webflow.io,http://localhost:5173,http://127.0.0.1:5173"
-  }
+  },
+  // Staging abuse control only — authoritative quotas remain in the API ledger.
+  // namespace_id must stay unique on the BOTSTACKS Cloudflare account.
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1197",
+      "simple": {
+        "limit": 120,
+        "period": 60
+      }
+    }
+  ]
 }
