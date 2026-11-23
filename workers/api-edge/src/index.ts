@@ -26,6 +26,7 @@ export const NO_CACHE_PREFIXES = [
   "/widget/handoff",
   "/widget/skill",
   "/v1/",
+  "/internal/",
   "/billing/",
   "/stripe/",
   "/account/",

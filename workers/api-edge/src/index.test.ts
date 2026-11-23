@@ -44,6 +44,7 @@ describe("isNoCachePath", () => {
     assert.equal(isNoCachePath("/widget/chat"), true);
     assert.equal(isNoCachePath("/webhooks/stripe/sabermetrics"), true);
     assert.equal(isNoCachePath("/v1/chat/completions"), true);
+    assert.equal(isNoCachePath("/internal/sabermetrics/answers/authorize"), true);
     assert.equal(isNoCachePath("/billing/portal"), true);
     assert.equal(isNoCachePath("/stripe/checkout"), true);
     assert.equal(isNoCachePath("/account/me"), true);
