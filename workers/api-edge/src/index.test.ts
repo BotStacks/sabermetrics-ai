@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  applyUpstreamEdgeHeaders,
   corsHeaders,
   isNoCachePath,
   needsTurnstile,
@@ -57,5 +58,28 @@ describe("needsTurnstile", () => {
     assert.equal(needsTurnstile("/widget/chat", "POST"), false);
     assert.equal(needsTurnstile("/webhooks/stripe/sabermetrics", "POST"), false);
     assert.equal(needsTurnstile("/widget/session", "GET"), false);
+  });
+});
+
+describe("applyUpstreamEdgeHeaders", () => {
+  it("forwards shared secret as x-sabermetrics-edge and drops host", () => {
+    const headers = applyUpstreamEdgeHeaders(
+      new Headers({ host: "sabermetrics-api-edge-staging.botstacks.workers.dev" }),
+      "rid-1",
+      "sabermetrics-api-edge-staging.botstacks.workers.dev",
+      "test-secret",
+    );
+    assert.equal(headers.get("x-sabermetrics-edge"), "test-secret");
+    assert.equal(headers.get("x-request-id"), "rid-1");
+    assert.equal(
+      headers.get("x-forwarded-host"),
+      "sabermetrics-api-edge-staging.botstacks.workers.dev",
+    );
+    assert.equal(headers.get("host"), null);
+  });
+
+  it("omits edge header when secret unset", () => {
+    const headers = applyUpstreamEdgeHeaders(new Headers(), "rid-2", "edge", undefined);
+    assert.equal(headers.get("x-sabermetrics-edge"), null);
   });
 });
