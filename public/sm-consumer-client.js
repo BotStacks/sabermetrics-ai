@@ -174,6 +174,15 @@
       document.querySelector(".sm-links-1, .sm-links-1-2, .sm-links-1-2-3") ||
       document.getElementById("sm-msg");
     if (!host) return;
+    // Webflow already ships a static link row; hide it so Forgot password
+    // appears once (prominent client bar) instead of duplicated.
+    document
+      .querySelectorAll(".sm-links-1, .sm-links-1-2, .sm-links-1-2-3")
+      .forEach(function (el) {
+        if (el.id === "sm-auth-links") return;
+        el.setAttribute("hidden", "");
+        el.style.display = "none";
+      });
     var bar = document.getElementById("sm-auth-links");
     if (!bar) {
       bar = document.createElement("p");
