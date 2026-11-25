@@ -735,7 +735,39 @@
     });
   }
 
+  /** Homepage / marketing: replace waitlist leftovers with product CTAs. */
+  function polishMarketingSite() {
+    var beta = document.getElementById("beta");
+    if (beta && !beta.getAttribute("data-sm-productized")) {
+      beta.setAttribute("data-sm-productized", "1");
+      var form = beta.querySelector("form");
+      if (form) {
+        form.style.display = "none";
+        var ctas = document.createElement("p");
+        ctas.className = "sm-copy";
+        ctas.innerHTML =
+          '<a class="sm-button w-button" href="/signup">Create account</a> ' +
+          '<a class="sm-card-link" href="/login" style="margin-left:1rem">Log in</a> ' +
+          '<a class="sm-card-link" href="/ask" style="margin-left:1rem">Ask →</a>';
+        form.parentNode.insertBefore(ctas, form);
+      }
+      var submit = beta.querySelector('input[type="submit"]');
+      if (submit && /join the beta/i.test(submit.value || "")) {
+        submit.value = "Create account";
+      }
+      var heading = beta.querySelector("h1, h2, .sm-h1, .sm-h2");
+      if (heading && /first inning|private beta|register interest/i.test(heading.textContent || "")) {
+        heading.textContent = "Ready to ask?";
+      }
+    }
+    document.querySelectorAll('a[href="#beta"]').forEach(function (a) {
+      a.setAttribute("href", "/signup");
+      if (/join the beta/i.test(a.textContent || "")) a.textContent = "Create account";
+    });
+  }
+
   function boot() {
+    polishMarketingSite();
     var root = document.querySelector("[data-sm-page]");
     if (!root) return;
     var page = root.getAttribute("data-sm-page");
