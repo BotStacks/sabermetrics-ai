@@ -48,6 +48,9 @@ describe("isNoCachePath", () => {
     assert.equal(isNoCachePath("/billing/portal"), true);
     assert.equal(isNoCachePath("/stripe/checkout"), true);
     assert.equal(isNoCachePath("/account/me"), true);
+    assert.equal(isNoCachePath("/sabermetrics/ask"), true);
+    assert.equal(isNoCachePath("/sabermetrics/bootstrap"), true);
+    assert.equal(isNoCachePath("/sabermetrics/me"), true);
     assert.equal(isNoCachePath("/healthz"), false);
   });
 });

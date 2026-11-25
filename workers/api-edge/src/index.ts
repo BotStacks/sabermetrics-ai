@@ -30,6 +30,7 @@ export const NO_CACHE_PREFIXES = [
   "/billing/",
   "/stripe/",
   "/account/",
+  "/sabermetrics/",
 ] as const;
 
 const SECURITY_HEADERS: Record<string, string> = {
