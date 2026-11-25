@@ -137,8 +137,27 @@
     var terms = form.querySelector('input[name="accept_terms"]');
     if (terms) {
       terms.id = "sm-accept-terms";
-      var labelSpan = form.querySelector(".w-form-label");
-      if (labelSpan) labelSpan.textContent = "I agree to the Terms of Use and Privacy Policy";
+      // Webflow nests a w-form-label ("accept_terms") plus outer copy — keep one sentence.
+      var outer = form.querySelector(".sm-check") || terms.closest("label");
+      if (outer) {
+        var keepBox = outer.querySelector(".w-checkbox") || terms.parentNode;
+        outer.innerHTML = "";
+        if (keepBox) {
+          var span = keepBox.querySelector(".w-form-label");
+          if (span) {
+            span.textContent = "";
+            span.setAttribute("aria-hidden", "true");
+          }
+          outer.appendChild(keepBox);
+        } else {
+          outer.appendChild(terms);
+        }
+        var copy = document.createElement("span");
+        copy.className = "sm-terms-copy";
+        copy.innerHTML =
+          ' I agree to the <a class="sm-a" href="/terms">Terms of Use</a> and <a class="sm-a" href="/privacy">Privacy Policy</a>';
+        outer.appendChild(copy);
+      }
     }
     // Unique ids — Webflow left every input as id=field
     form.querySelectorAll("input").forEach(function (inp, i) {
@@ -148,6 +167,87 @@
       var lab = inp.closest("label");
       if (lab && !lab.getAttribute("for") && inp.id) lab.setAttribute("for", inp.id);
     });
+  }
+
+  function ensureAuthLinks(page) {
+    var host =
+      document.querySelector(".sm-links-1, .sm-links-1-2, .sm-links-1-2-3") ||
+      document.getElementById("sm-msg");
+    if (!host) return;
+    // Webflow already ships a static link row; hide it so Forgot password
+    // appears once (prominent client bar) instead of duplicated.
+    document
+      .querySelectorAll(".sm-links-1, .sm-links-1-2, .sm-links-1-2-3")
+      .forEach(function (el) {
+        if (el.id === "sm-auth-links") return;
+        el.setAttribute("hidden", "");
+        el.style.display = "none";
+      });
+    var bar = document.getElementById("sm-auth-links");
+    if (!bar) {
+      bar = document.createElement("p");
+      bar.id = "sm-auth-links";
+      bar.className = "sm-auth-links";
+      bar.style.cssText = "margin-top:1rem;line-height:1.6;";
+      if (host.id === "sm-msg") host.parentNode.insertBefore(bar, host);
+      else host.parentNode.insertBefore(bar, host.nextSibling);
+    }
+    if (page === "login") {
+      bar.innerHTML =
+        '<a class="sm-a" href="/forgot-password" style="font-weight:600;">Forgot password?</a>' +
+        ' · <a class="sm-a" href="/signup">Create an account</a>' +
+        ' · <a class="sm-a" href="/account">Account</a>';
+    } else if (page === "signup") {
+      bar.innerHTML =
+        '<a class="sm-a" href="/login">Log in</a>' +
+        ' · <a class="sm-a" href="/forgot-password">Forgot password?</a>';
+    }
+  }
+
+  function showRecovery(email, kind) {
+    var host = document.getElementById("sm-msg");
+    if (!host) return;
+    var box = document.getElementById("sm-recovery");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "sm-recovery";
+      box.style.cssText = "margin-top:0.85rem;display:flex;flex-wrap:wrap;gap:0.6rem;";
+      host.parentNode.insertBefore(box, host.nextSibling);
+    }
+    var q = email ? "?email=" + encodeURIComponent(email) : "";
+    var html = "";
+    if (kind === "exists") {
+      html +=
+        '<a class="sm-btn w-button" href="/login' +
+        q +
+        '">Log in</a>' +
+        '<a class="sm-btn-secondary w-button" href="/forgot-password' +
+        q +
+        '">Reset password</a>';
+    } else if (kind === "credentials") {
+      html +=
+        '<a class="sm-btn w-button" href="/forgot-password' +
+        q +
+        '">Reset password</a>';
+    } else if (kind === "google") {
+      html +=
+        '<a class="sm-btn w-button" href="/forgot-password' +
+        q +
+        '">Set an email password</a>';
+    }
+    box.innerHTML = html;
+  }
+
+  function clearRecovery() {
+    var box = document.getElementById("sm-recovery");
+    if (box) box.innerHTML = "";
+  }
+
+  function prefillEmail(form) {
+    var params = new URLSearchParams(location.search);
+    var email = params.get("email");
+    var field = form.querySelector('input[name="email"], input[type="email"]');
+    if (email && field && !field.value) field.value = email;
   }
 
   function polishSubmit(form, label) {
@@ -216,11 +316,19 @@
     form = takeOverAuthForm(form);
     fixFieldNames(form);
     polishSubmit(form, "Log in");
+    ensureAuthLinks("login");
+    prefillEmail(form);
     var pw = form.querySelector('input[type="password"]');
     if (pw) {
       pw.setAttribute("autocomplete", "current-password");
-      pw.setAttribute("placeholder", "Your password");
+      pw.setAttribute("placeholder", "Your BotStacks / SaberMetrics password");
       ensurePasswordToggle(pw);
+    }
+    var lead = document.querySelector(".sm-lead-1, .sm-lead-1-2, .sm-lead");
+    if (lead && !lead.getAttribute("data-sm-shared")) {
+      lead.setAttribute("data-sm-shared", "1");
+      lead.textContent =
+        "Use the same email and password as BotStacks sandbox. SaberMetrics shares that login — no second account.";
     }
     form.addEventListener(
       "submit",
@@ -228,6 +336,7 @@
         ev.preventDefault();
         ev.stopImmediatePropagation();
         msg("");
+        clearRecovery();
         var fd = new FormData(form);
         var email = String(fd.get("email") || "").trim();
         var password = String(fd.get("password") || "");
@@ -253,6 +362,20 @@
             if (e.status === 403 && /not verified/i.test(e.message || "")) {
               msg("Verify your email before logging in. Check your inbox, or resend below.");
               showResend(email);
+              return;
+            }
+            if (/google sign-in/i.test(e.message || "")) {
+              msg(
+                "This account uses Google sign-in. Set an email password with Forgot password to use SaberMetrics, or sign in with Google on BotStacks."
+              );
+              showRecovery(email, "google");
+              return;
+            }
+            if (e.status === 401 || /invalid credentials/i.test(e.message || "")) {
+              msg(
+                "That email and password did not match. Use your BotStacks password, or reset it — SaberMetrics does not create a separate login."
+              );
+              showRecovery(email, "credentials");
               return;
             }
             msg(e.message || "Login failed");
@@ -293,14 +416,23 @@
     form = takeOverAuthForm(form);
     fixFieldNames(form);
     polishSubmit(form, "Create account");
+    ensureAuthLinks("signup");
+    prefillEmail(form);
     var pw = form.querySelector('input[name="password"]');
     if (pw) ensurePasswordToggle(pw);
+    var lead = document.querySelector(".sm-lead-1-2, .sm-lead-1, .sm-lead");
+    if (lead && !lead.getAttribute("data-sm-shared")) {
+      lead.setAttribute("data-sm-shared", "1");
+      lead.textContent =
+        "New here? Create an account. Already on BotStacks? Log in with that email — SaberMetrics shares the same account.";
+    }
     form.addEventListener(
       "submit",
       function (ev) {
         ev.preventDefault();
         ev.stopImmediatePropagation();
         msg("");
+        clearRecovery();
         var fd = new FormData(form);
         var name = String(fd.get("name") || "").trim();
         var email = String(fd.get("email") || "").trim();
@@ -341,7 +473,10 @@
           .catch(function (e) {
             setLoading(form, false);
             if (e.status === 409 || /already registered/i.test(e.message || "")) {
-              msg("An account with that email already exists. Log in, or reset your password.");
+              msg(
+                "That email already has a BotStacks / SaberMetrics account. Log in with your existing password, or reset it — we do not create a second account."
+              );
+              showRecovery(email, "exists");
               return;
             }
             msg(e.message || "Signup failed");
@@ -355,6 +490,13 @@
     form = takeOverAuthForm(form);
     fixFieldNames(form);
     polishSubmit(form, "Email reset link");
+    prefillEmail(form);
+    var lead = document.querySelector(".sm-lead-1, .sm-lead-1-2, .sm-lead");
+    if (lead && !lead.getAttribute("data-sm-shared")) {
+      lead.setAttribute("data-sm-shared", "1");
+      lead.textContent =
+        "We email a reset link for BotStacks / SaberMetrics accounts (same login). Check spam if it is slow.";
+    }
     form.addEventListener(
       "submit",
       function (ev) {
@@ -371,7 +513,10 @@
         api("/auth/request-password-reset", { method: "POST", body: { email: email } })
           .then(function () {
             setLoading(form, false);
-            msg("If that email has an account, a reset link is on the way.", "ok");
+            msg(
+              "If that email has an account, a reset link is on the way from BotStacks. Check inbox and spam, then return here to set a new password.",
+              "ok"
+            );
           })
           .catch(function (e) {
             setLoading(form, false);
