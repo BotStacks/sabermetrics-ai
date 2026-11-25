@@ -7,9 +7,15 @@
   var KEY = "sm_access_token";
   var PASS_HINT = "At least 8 characters.";
 
-  function msg(t) {
+  function msg(t, kind) {
     var el = document.getElementById("sm-msg");
-    if (el) el.textContent = t || "";
+    if (!el) return;
+    el.textContent = t || "";
+    if (!t) {
+      el.style.color = "";
+      return;
+    }
+    el.style.color = kind === "ok" ? "#174d37" : "#9b2c2c";
   }
 
   function token() {
@@ -269,10 +275,14 @@
       btn.disabled = true;
       api("/auth/resend-verification", { method: "POST", body: { email: email } })
         .then(function () {
-          msg("If that account needs verification, a new email is on the way.");
+          msg("If that account needs verification, a new email is on the way.", "ok");
         })
         .catch(function (e) {
-          msg(e.message || "Could not resend verification email");
+          if (e.status === 404) {
+            msg("Resend is not live on staging API yet — check your inbox for the first email.");
+          } else {
+            msg(e.message || "Could not resend verification email");
+          }
           btn.disabled = false;
         });
     });
@@ -321,7 +331,10 @@
         })
           .then(function () {
             setLoading(form, false);
-            msg("Check your email to verify your account. Five free answers unlock after verification.");
+            msg(
+              "Check your email to verify your account. Five free answers unlock after verification.",
+              "ok"
+            );
             form.reset();
             showResend(email);
           })
@@ -358,7 +371,7 @@
         api("/auth/request-password-reset", { method: "POST", body: { email: email } })
           .then(function () {
             setLoading(form, false);
-            msg("If that email has an account, a reset link is on the way.");
+            msg("If that email has an account, a reset link is on the way.", "ok");
           })
           .catch(function (e) {
             setLoading(form, false);
@@ -401,7 +414,7 @@
         })
           .then(function () {
             setLoading(form, false);
-            msg("Password updated. You can log in.");
+            msg("Password updated. You can log in.", "ok");
             setTimeout(function () {
               location.href = "/login";
             }, 1200);
@@ -565,10 +578,14 @@
       if (!email) return;
       api("/auth/resend-verification", { method: "POST", body: { email: email } })
         .then(function () {
-          msg("If that account needs verification, a new email is on the way.");
+          msg("If that account needs verification, a new email is on the way.", "ok");
         })
         .catch(function (e) {
-          msg(e.message || "Could not resend");
+          if (e.status === 404) {
+            msg("Resend is not live on staging API yet — open the link from your first email.");
+          } else {
+            msg(e.message || "Could not resend");
+          }
         });
     });
   }
